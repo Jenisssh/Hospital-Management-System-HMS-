@@ -1,0 +1,93 @@
+@echo off
+REM ============================================================================
+REM  HMS v2 — Start everything
+REM
+REM  Setup:
+REM    1. Copy this file: copy start-all.cmd.example start-all.cmd
+REM    2. (Optional) Adjust timeouts below for your machine speed.
+REM    3. Run setup-env.ps1 first to set JWT_SECRET, then start-all.cmd.
+REM
+REM  Opens 9 separate cmd windows, one per service. Order matters:
+REM    1. config-server  (must be first — others fetch config from it)
+REM    2. service-registry (Eureka — must be up before clients try to register)
+REM    3-7. Domain services
+REM    8. api-gateway
+REM    9. Frontend dev server
+REM
+REM  Each service window stays open. Close a window to stop that service.
+REM  Use stop-all.cmd to kill them by port.
+REM ============================================================================
+
+setlocal
+
+REM Validate JWT_SECRET
+if "%JWT_SECRET%"=="" (
+    echo.
+    echo ============================================================
+    echo   ERROR: JWT_SECRET environment variable is not set.
+    echo   Copy setup-env.ps1.example to setup-env.ps1, edit the secret,
+    echo   then run:
+    echo     powershell -ExecutionPolicy Bypass -File setup-env.ps1
+    echo   Close and reopen all terminals afterward.
+    echo ============================================================
+    echo.
+    pause
+    exit /b 1
+)
+
+cd /d "%~dp0"
+
+echo.
+echo  Starting HMS v2 — full stack
+echo  ==============================
+echo.
+
+echo [1/9] config-server  (port 8888)
+start "config-server" cmd /k "cd config-server && mvn spring-boot:run"
+echo       waiting 25s for Spring Cloud Config Server to come up...
+timeout /t 25 /nobreak > nul
+
+echo [2/9] service-registry  (Eureka, port 8761)
+start "service-registry" cmd /k "cd service-registry && mvn spring-boot:run"
+echo       waiting 15s...
+timeout /t 15 /nobreak > nul
+
+echo [3/9] auth-service  (port 8084)
+start "auth-service" cmd /k "cd auth-service && mvn spring-boot:run"
+
+echo [4/9] patient-service  (port 8082)
+start "patient-service" cmd /k "cd patient-service && mvn spring-boot:run"
+
+echo [5/9] doctor-service  (port 8081)
+start "doctor-service" cmd /k "cd doctor-service && mvn spring-boot:run"
+
+echo [6/9] appointment-service  (port 8083)
+start "appointment-service" cmd /k "cd appointment-service && mvn spring-boot:run"
+
+echo [7/9] payment-service  (port 8085)
+start "payment-service" cmd /k "cd payment-service && mvn spring-boot:run"
+
+echo       waiting 30s for domain services to register with Eureka...
+timeout /t 30 /nobreak > nul
+
+echo [8/9] api-gateway  (port 8080)
+start "api-gateway" cmd /k "cd api-gateway && mvn spring-boot:run"
+echo       waiting 15s...
+timeout /t 15 /nobreak > nul
+
+echo [9/9] frontend  (Vite, port 5173)
+start "hms-frontend" cmd /k "cd hms-frontend && npm run dev"
+
+echo.
+echo ============================================================
+echo   All services starting. Allow another ~30s for full readiness.
+echo.
+echo   Frontend:        http://localhost:5173
+echo   Eureka:          http://localhost:8761
+echo   Config Server:   http://localhost:8888
+echo.
+echo   Default login:   admin / admin123
+echo ============================================================
+echo.
+
+endlocal

@@ -1,0 +1,21 @@
+# Sets the JWT_SECRET env var at user scope.
+#
+# Setup:
+#   1. Copy this file: copy setup-env.ps1.example setup-env.ps1
+#   2. Edit setup-env.ps1 and replace the placeholder below with your own secret
+#      (any random string of 32+ characters — the longer, the better).
+#   3. Run once: powershell -ExecutionPolicy Bypass -File setup-env.ps1
+#   4. CLOSE and REOPEN all terminals so the variable propagates.
+#
+# The real setup-env.ps1 is gitignored so your secret never leaves your machine.
+
+$secret = "<replace-with-your-own-long-random-secret-of-at-least-32-chars>"
+
+[Environment]::SetEnvironmentVariable("JWT_SECRET", $secret, "User")
+
+Write-Host ""
+Write-Host "JWT_SECRET set at User scope (length=$($secret.Length))." -ForegroundColor Green
+Write-Host "Close and reopen any terminals/IDE to pick up the change." -ForegroundColor Yellow
+Write-Host ""
+Write-Host "To verify in a new terminal:" -ForegroundColor Cyan
+Write-Host '  echo $env:JWT_SECRET'
