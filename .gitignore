@@ -1,0 +1,56 @@
+# Build outputs
+**/target/
+**/build/
+**/dist/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+.classpath
+.project
+.settings/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+logs/
+
+# Frontend
+**/node_modules/
+**/.vite/
+**/.env.local
+**/.env.*.local
+
+# Secrets / env
+.env
+.env.local
+*.pem
+*.p12
+
+# Maven wrapper (keep mvnw.cmd, ignore extracted jar)
+.mvn/wrapper/maven-wrapper.jar
+
+# Java keystores / certs (in case you add HTTPS later)
+*.jks
+*.keystore
+
+# Frontend test coverage
+**/coverage/
+
+# Editor swap/backup files
+*.swp
+*.swo
+*.bak
+*~
+
+# Spring Boot auto-generated (optional)
+HELP.md
+
+# Local dev scripts
+/*.cmd
+/*.ps1

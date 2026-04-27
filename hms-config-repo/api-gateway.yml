@@ -1,0 +1,57 @@
+server:
+  port: 8080
+
+spring:
+  cloud:
+    gateway:
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins:
+              - "http://localhost:5173"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - PATCH
+              - DELETE
+              - OPTIONS
+            allowedHeaders: "*"
+            allowCredentials: true
+            maxAge: 3600
+      routes:
+        - id: auth-service
+          uri: lb://auth-service
+          predicates:
+            - Path=/auth/**
+
+        - id: patient-service
+          uri: lb://patient-service
+          predicates:
+            - Path=/patients/**
+
+        - id: doctor-service
+          uri: lb://doctor-service
+          predicates:
+            - Path=/doctors/**,/departments/**
+
+        - id: appointment-service
+          uri: lb://appointment-service
+          predicates:
+            - Path=/appointments/**
+
+        - id: payment-service
+          uri: lb://payment-service
+          predicates:
+            - Path=/payments/**
+
+# JWT — same secret as auth-service. NEVER hardcode.
+hms:
+  jwt:
+    secret: ${JWT_SECRET}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,gateway

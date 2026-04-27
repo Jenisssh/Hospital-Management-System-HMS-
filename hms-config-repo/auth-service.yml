@@ -1,0 +1,24 @@
+server:
+  port: 8084
+
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/hms_db
+    username: root
+    password: system
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
+    show-sql: false
+    open-in-view: false
+
+# JWT — secret comes from JWT_SECRET env var (NEVER hardcode)
+hms:
+  jwt:
+    secret: ${JWT_SECRET}
+    expiration-ms: 86400000   # 24 hours
